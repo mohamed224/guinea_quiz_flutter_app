@@ -84,87 +84,106 @@ class _GuineaQuizScreenState extends State<GuineaQuizScreen> {
           )
         ],
       ),
-      body: Column(
-        children: [
-          Center(
-            child: Container(
-              padding: const EdgeInsets.only(top: 15),
-              margin: const EdgeInsets.symmetric(horizontal: 15),
-              child: Text(
-                "Question : ${currentQuestion + 1}/${quiz.length}",
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+      body: currentQuestion >= quiz.length
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Score : $score/10',
+                      style:
+                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
+                  Container(
+                    height: 15,
+                  ),
+                  Container(
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          currentQuestion = 0;
+                          score = 0;
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        margin: const EdgeInsets.all(10),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.green),
+                        child: Text(
+                          'Voulez-vous rejouer?',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 25, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
               ),
-            ),
-          ),
-          Container(
-            height: 30,
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 10),
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: FittedBox(
-                  child: Text(
-                quiz[currentQuestion + 1]['title'],
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
-              )),
-            ),
-          ),
-          Container(
-            height: 30,
-          ),
-          ...(quiz[currentQuestion]['answers'] as List<Map<String, Object>>)
-              .map((answer) {
-            return InkWell(
-              onTap: () {
-                print("lol");
-              },
-              child: Container(
-                
-                width: 200,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.yellow),
-                child: 
-               Text(
-                    answer['answer']   
+            )
+          : Column(
+              children: [
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.only(top: 15),
+                    margin: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Text(
+                      "Question : ${currentQuestion + 1}/${quiz.length}",
+                      style:
+                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
-              )
-            
-          })
-        ],
-      ),
-    );
-  }
-}
-
-class QuizButton extends StatelessWidget {
-  Map<String, Object> answer;
-  QuizButton({Map<String, Object> answer});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        print("lol");
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 10),
-        width: double.infinity,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20), color: Colors.yellow),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: FittedBox(
-              child: Text(
-            'lol',
-            //answer['answer'],
-            style: TextStyle(fontSize: 18),
-          )),
-        ),
-      ),
+                Container(
+                  height: 30,
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                  width: double.infinity,
+                  child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        quiz[currentQuestion]['title'],
+                        style: TextStyle(
+                            fontSize: 22, fontWeight: FontWeight.w900),
+                      )),
+                ),
+                Container(
+                  height: 30,
+                ),
+                ...(quiz[currentQuestion]['answers']
+                        as List<Map<String, Object>>)
+                    .map((answer) {
+                  return Container(
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          ++currentQuestion;
+                          if (answer['correct']) {
+                            score += answer['point'];
+                          }
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        margin: const EdgeInsets.all(10),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.yellow),
+                        child: Text(
+                          answer['answer'],
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  );
+                })
+              ],
+            ),
     );
   }
 }
