@@ -16,7 +16,7 @@ class _GuineaQuizState extends State<GuineaQuiz> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Guinea Quiz',
+      title: 'Quiz Guinée',
         theme: ThemeData(
                 primarySwatch: Colors.grey,
                 accentColor: Colors.teal,

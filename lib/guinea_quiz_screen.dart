@@ -75,7 +75,7 @@ class _GuineaQuizScreenState extends State<GuineaQuizScreen> {
         leading: Icon(Icons.arrow_back),
         backgroundColor: Colors.red,
         elevation: 0.5,
-        title: Text("Guinea Quiz"),
+        title: Text("Quiz Guinée"),
         centerTitle: true,
         actions: [
           Container(
