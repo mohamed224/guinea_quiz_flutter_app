@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 class GuineaQuizScreen extends StatefulWidget {
@@ -6,9 +8,14 @@ class GuineaQuizScreen extends StatefulWidget {
 }
 
 class _GuineaQuizScreenState extends State<GuineaQuizScreen> {
-  int currentQuestion = 0;
+  int _currentQuestion = 0;
   int score = 0;
-  final quiz = [
+  int _minute = 0;
+  Timer _timer;
+  int _counter = 0;
+  String _timeElapsed = '';
+  bool _isStarted = true;
+  final _quiz = [
     {
       'title': 'En Guinée, le président est élu pour :',
       'answers': [
@@ -68,6 +75,29 @@ class _GuineaQuizScreenState extends State<GuineaQuizScreen> {
     }
   ];
 
+  String _formatTime() {
+    return "${_minute < 10 ? "0$_minute" : _minute}:"
+        "${_counter < 10 ? "0$_counter" : _counter}";
+  }
+
+  _startTimer() {
+    if (_timer != null) {
+      _timer.cancel();
+    }
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_currentQuestion >= 1 && _currentQuestion < _quiz.length) {
+          _counter++;
+
+          if (_counter == 60) {
+            _minute++;
+            _counter = 0;
+          }
+        }
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,12 +114,18 @@ class _GuineaQuizScreenState extends State<GuineaQuizScreen> {
           )
         ],
       ),
-      body: currentQuestion >= quiz.length
+      body: _currentQuestion >= _quiz.length
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Score : $score/10',
+                  Text('Temps ecoulé = $_timeElapsed',
+                      style:
+                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
+                  Container(
+                    height: 15,
+                  ),
+                  Text('Score = $score/10',
                       style:
                           TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
                   Container(
@@ -99,8 +135,11 @@ class _GuineaQuizScreenState extends State<GuineaQuizScreen> {
                     child: InkWell(
                       onTap: () {
                         setState(() {
-                          currentQuestion = 0;
+                          _currentQuestion = 0;
                           score = 0;
+                          _counter = 0;
+                          _minute = 0;
+                          _timeElapsed = '';
                         });
                       },
                       child: Container(
@@ -125,11 +164,19 @@ class _GuineaQuizScreenState extends State<GuineaQuizScreen> {
           : Column(
               children: [
                 Center(
+                    child: Container(
+                        padding: const EdgeInsets.only(top: 25),
+                        child: Text(
+                          _formatTime(),
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w900),
+                        ))),
+                Center(
                   child: Container(
                     padding: const EdgeInsets.only(top: 15),
                     margin: const EdgeInsets.symmetric(horizontal: 15),
                     child: Text(
-                      "Question : ${currentQuestion + 1}/${quiz.length}",
+                      "Question : ${_currentQuestion + 1}/${_quiz.length}",
                       style:
                           TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                     ),
@@ -144,7 +191,7 @@ class _GuineaQuizScreenState extends State<GuineaQuizScreen> {
                   child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        quiz[currentQuestion]['title'],
+                        _quiz[_currentQuestion]['title'],
                         style: TextStyle(
                             fontSize: 22, fontWeight: FontWeight.w900),
                       )),
@@ -152,14 +199,19 @@ class _GuineaQuizScreenState extends State<GuineaQuizScreen> {
                 Container(
                   height: 30,
                 ),
-                ...(quiz[currentQuestion]['answers']
+                ...(_quiz[_currentQuestion]['answers']
                         as List<Map<String, Object>>)
                     .map((answer) {
                   return Container(
                     child: InkWell(
                       onTap: () {
+                        if (_isStarted) {
+                          _startTimer();
+                          _isStarted = false;
+                        }
                         setState(() {
-                          ++currentQuestion;
+                          ++_currentQuestion;
+                          _timeElapsed = _formatTime();
                           if (answer['correct']) {
                             score += answer['point'];
                           }
